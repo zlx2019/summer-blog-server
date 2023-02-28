@@ -1,11 +1,13 @@
 package config
 
+import "fmt"
+
 // Config 配置文件
 // 将settings.yml文件中的配置解析到此结构
 type Config struct {
-	server Server `yaml:"server"`
-	mysql  Mysql  `yaml:"mysql"`
-	logger Logger `yaml:"logger"`
+	Server Server `yaml:"server"`
+	Mysql  Mysql  `yaml:"mysql"`
+	Logger Logger `yaml:"logger"`
 }
 
 // Server 	服务相关配置
@@ -29,6 +31,12 @@ type Mysql struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 	LogLevel string `yaml:"log_level"`
+}
+
+// Dns 拼接Mysql链接
+func (m *Mysql) Dns() string {
+	// user:pass@tcp(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True&loc=Local
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", m.Username, m.Password, m.Host, m.Port, m.DbName)
 }
 
 // Logger 		日志配置
