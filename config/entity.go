@@ -50,7 +50,7 @@ func (m *Mysql) Dns() string {
 type Logger struct {
 	Level        string `yaml:"level"`
 	Prefix       string `yaml:"prefix"`
-	FilePath     string `yaml:"file_Path"`
-	ShowLine     bool   `yaml:"show_Line"`
-	LogInConsole bool   `yaml:"log_In_Console"`
+	FilePath     string `yaml:"file_path"`
+	ShowLine     bool   `yaml:"show_line"`
+	LogInConsole bool   `yaml:"log_in_console"`
 }

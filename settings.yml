@@ -2,7 +2,7 @@
 server:
   host: 0.0.0.0
   port: 13001
-  env: dev
+  env: debug  #debug|release
 
 # mysql配置
 mysql:
@@ -16,7 +16,7 @@ mysql:
 
 # 日志配置
 logger:
-  level: info #日志等级
+  level: debug #日志等级 info warning debug
   prefix: "[summer-blog]" #日志前缀
   file_path: log #日志生成的目录名
   show_line: true #是否显示行号

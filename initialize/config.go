@@ -29,9 +29,3 @@ func InitLoadConfigure() {
 	// 放到全局变量中
 	constant.Config = conf
 }
-
-// 包初始化
-func init() {
-	// 读取配置文件
-	InitLoadConfigure()
-}

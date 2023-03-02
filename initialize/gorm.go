@@ -10,17 +10,18 @@ import (
 	"os"
 	"summer/config"
 	"summer/constant"
+	"summer/utils"
 	"time"
 )
-
-func init() {
-	initMysqlConfigure()
-}
 
 // initMysqlConfigure 初始化Mysql
 func initMysqlConfigure() {
 	// 获取Mysql相关配置属性
 	dbConfig := &constant.Config.Mysql
+	if utils.StrIsBlank(dbConfig.Host) {
+		constant.Log.Panic("Mysql Host 未配置")
+	}
+
 	// Mysql配置
 	mysqlConfig := getMysqlConfig(dbConfig)
 	// gorm 配置
@@ -36,7 +37,7 @@ func initMysqlConfigure() {
 	db.SetConnMaxLifetime(time.Hour * 4) //设置可以重用连接的最长时间
 	// 放到全局变量
 	constant.Db = db
-
+	constant.Log.Info("Gorm Init Success.")
 }
 
 // 自定义Mysql配置
@@ -50,9 +51,9 @@ func getMysqlConfig(conf *config.Mysql) mysql.Config {
 
 // getGormConfig 自定义Gorm配置
 func getGormConfig(conf *config.Mysql) *gorm.Config {
-	logLevel := logger.Silent
-	if conf.LogLevel == "dev" {
-		logLevel = logger.Info
+	logLevel := logger.Info
+	if conf.LogLevel == "prod" {
+		logLevel = logger.Error
 	}
 	//自定义日志器
 	newLogger := logger.New(
