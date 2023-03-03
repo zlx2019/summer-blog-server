@@ -7,12 +7,16 @@
 
 package user
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"summer/constant"
+	"summer/models/mono"
+)
 
 type HandlerUser struct {
 }
 
 // Hello TestAPI
 func (*HandlerUser) Hello(ctx *gin.Context) {
-	ctx.JSON(200, "Hello")
+	mono.FailWithCode(constant.UserNotFound, ctx)
 }

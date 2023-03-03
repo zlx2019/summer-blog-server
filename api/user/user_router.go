@@ -23,5 +23,6 @@ func init() {
 // Route User服务路由定义
 func (u *RouterUser) Route(engine *gin.Engine) {
 	handler := &HandlerUser{}
-	engine.GET("/hello", handler.Hello)
+	ug := engine.Group("/user")
+	ug.GET("/hello", handler.Hello)
 }
