@@ -7,5 +7,10 @@
 
 package models
 
+import "summer/models/custom"
+
+// Tag 标签表结构
 type Tag struct {
+	custom.BaseModel
+	Name string `json:"name" gorm:"size:30; not null; comment: 标签名称"`
 }

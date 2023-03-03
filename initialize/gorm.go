@@ -10,6 +10,7 @@ import (
 	"os"
 	"summer/config"
 	"summer/constant"
+	. "summer/models"
 	"summer/utils"
 	"time"
 )
@@ -36,8 +37,17 @@ func initMysqlConfigure() {
 	db.SetMaxOpenConns(100)              //连接池数据库的最大打开连接数,默认为0不上限.
 	db.SetConnMaxLifetime(time.Hour * 4) //设置可以重用连接的最长时间
 	// 放到全局变量
-	constant.Db = db
+	constant.Db = client
 	constant.Log.Info("Gorm Init Success.")
+	// 设置自定义关联表 替代默认生成的关系表
+	client.SetupJoinTable(&User{}, "LikeArticles", &UserLickArticle{})
+	client.SetupJoinTable(&Article{}, "tags", &ArticleTag{})
+
+	// 根据结构自动创建数据表
+	client.AutoMigrate(&User{}, &Article{}, &UserLickArticle{}, &Tag{}, &ArticleTag{})
+
+	//client.Save(&Tag{Name: "Java"})
+	//client.Delete(&Tag{},1)
 }
 
 // 自定义Mysql配置

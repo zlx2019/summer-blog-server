@@ -28,10 +28,16 @@ type User struct {
 	// 用户(一) --- 文章(多)
 	// foreignKey 指定user表的Id,在articles表中的名字.
 	Articles []Article `json:"articles" gorm:"foreignKey: UserID"`
-	// 用户收藏的文章列表
-	// 多对多关系映射
+	// 用户收藏的文章列表,多对多关系映射,自定义关系表映射。
 	// many2many: user_like_article 关系表的名字
 	// joinForeignKey: UserID 关系表中User表的主键
 	// JoinReferences: ArticleID 关系表中Article标的主键
-	LikeArticles []Article `gorm:"many2many: user_like_article;joinForeignKey:UserID;JoinReferences:ArticleID" json:"likeArticles"`
+	LikeArticles []Article `gorm:"many2many:user_like_article;joinForeignKey:UserID;JoinReferences:ArticleID" json:"likeArticles"`
+}
+
+// UserLickArticle 自定义用户收藏文章结构 关系表
+type UserLickArticle struct {
+	ID        uint64 `gorm:"comment: 主键ID"`
+	UserID    uint64 `gorm:"comment: 用户ID"`
+	ArticleID uint64 `gorm:"comment: 收藏的文章ID"`
 }

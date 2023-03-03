@@ -13,8 +13,8 @@ import . "summer/models/custom"
 type Article struct {
 	BaseModel
 	Title        string `json:"title" gorm:"size:32; not null; comment: 文章标题"`
-	Desc         string `json:"desc" gorm:"size: 256; comment: 文章简介"`
-	Content      string `json:"content" gorm:"comment: 文章内容"`
+	Desc         string `json:"desc" gorm:"size:256; not null; comment: 文章简介"`
+	Content      string `json:"content" gorm:"type: longtext;comment: 文章内容"`
 	LookCount    int    `json:"look_count" gorm:"default:0; comment: 浏览量"`
 	CommentCount int    `json:"comment_count" gorm:"default:0; comment: 评论量"`
 	LikeCount    int    `json:"like_count" gorm:"default:0; comment: 点赞量"`
@@ -25,11 +25,18 @@ type Article struct {
 	WordCount    int    `json:"word_count" gorm:"comment: 文章字数"`
 
 	// 文章标签列表
-	Tags []Tag `json:"tags" gorm:"many2many:article_tag"`
+	Tags []Tag `json:"tags" gorm:"many2many:article_tag;joinForeignKey:ArticleID;JoinReferences:TagID"`
 	// 文章评论列表
-	Comments []Comment `json:"comments" gorm:"foreignKey:ArticleID"`
+	//Comments []Comment `json:"comments" gorm:"foreignKey:ArticleID"`
 	// 所属用户
 	User User `json:"user" gorm:"foreignKey:UserID"`
 	// 所属用户ID
-	UserID uint64 `json:"user_id"`
+	UserID uint64 `json:"user_id" gorm:"comment: 所属用户ID"`
+}
+
+// ArticleTag 文章与标签关系表结构
+type ArticleTag struct {
+	ID        uint64 `gorm:"comment: 主键ID"`
+	ArticleID uint64 `gorm:"comment: 文章ID"`
+	TagID     uint64 `gorm:"comment: 标签ID"`
 }
