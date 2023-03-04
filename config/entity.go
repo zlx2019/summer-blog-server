@@ -25,12 +25,13 @@ type Server struct {
 // Mysql 配置
 // LogLevel Sql日志等级. debug:输出全部sql。dev: 开发环境。release: 生产环境。
 type Mysql struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	DbName   string `yaml:"db_name"`
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
-	LogLevel string `yaml:"log_level"`
+	Host        string `yaml:"host"`
+	Port        int    `yaml:"port"`
+	DbName      string `yaml:"db_name"`
+	Username    string `yaml:"username"`
+	Password    string `yaml:"password"`
+	LogLevel    string `yaml:"log_level"`
+	CreateTable bool   `yaml:"create_table"`
 }
 
 // Dns 拼接Mysql链接

@@ -13,6 +13,8 @@ mysql:
   password: rootROOT@1234
   # dev环境输出sql日志
   log_level: dev
+  # 是否自动生成表结构
+  create_table: false
 
 # 日志配置
 logger:

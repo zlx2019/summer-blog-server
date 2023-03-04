@@ -1,0 +1,17 @@
+syntax = "proto3";
+package summer.proto.user;
+
+// 定义Go的生成目录为: `pb/user`和包名`pb_user`
+option go_package = "pb/user;pb_user";
+
+message UserRequest{
+  string user_name = 1;
+}
+
+message UserReply{
+  string result = 1;
+}
+
+service UserService{
+  rpc GetUser(UserRequest) returns(UserReply);
+}

@@ -39,15 +39,37 @@ func initMysqlConfigure() {
 	// 放到全局变量
 	constant.Db = client
 	constant.Log.Info("Gorm Init Success.")
+	// 表结构迁移生成
+	if dbConfig.CreateTable {
+		tableMigrate(client)
+	}
+}
+
+// 根据结构生成表结构
+func tableMigrate(client *gorm.DB) {
 	// 设置自定义关联表 替代默认生成的关系表
-	client.SetupJoinTable(&User{}, "LikeArticles", &UserLickArticle{})
+	client.SetupJoinTable(&User{}, "LikeArticles", &UserLikeArticle{})
 	client.SetupJoinTable(&Article{}, "tags", &ArticleTag{})
+	client.SetupJoinTable(&Menu{}, "Banners", &MenuFile{})
 
 	// 根据结构自动创建数据表
-	client.AutoMigrate(&User{}, &Article{}, &UserLickArticle{}, &Tag{}, &ArticleTag{})
-
-	//client.Save(&Tag{Name: "Java"})
-	//client.Delete(&Tag{},1)
+	err := client.AutoMigrate(
+		&User{},
+		&Article{},
+		&UserLikeArticle{},
+		&Tag{},
+		&ArticleTag{},
+		&Comment{},
+		&FadeBack{},
+		&File{},
+		&Menu{},
+		&MenuFile{},
+		&Message{},
+		&Advert{})
+	if err != nil {
+		constant.Log.Fatalf("表结构生成失败: %s", err)
+	}
+	constant.Log.Info("Table Create Success")
 }
 
 // 自定义Mysql配置
