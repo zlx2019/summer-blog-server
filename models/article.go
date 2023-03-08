@@ -14,7 +14,7 @@ type Article struct {
 	BaseModel
 	Title        string `json:"title" gorm:"size:32; not null; comment: 文章标题"`
 	Desc         string `json:"desc" gorm:"size:256; not null; comment: 文章简介"`
-	Content      string `json:"content" gorm:"type:text;comment: 文章内容"`
+	Content      string `json:"content" gorm:"size: ;comment: 文章内容"`
 	LookCount    int    `json:"look_count" gorm:"default:0; comment: 浏览量"`
 	CommentCount int    `json:"comment_count" gorm:"default:0; comment: 评论量"`
 	LikeCount    int    `json:"like_count" gorm:"default:0; comment: 点赞量"`
