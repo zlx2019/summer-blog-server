@@ -65,7 +65,9 @@ func tableMigrate(client *gorm.DB) {
 		&Menu{},
 		&MenuFile{},
 		&Message{},
-		&Advert{})
+		&Advert{},
+		&LoginLog{},
+	)
 	if err != nil {
 		constant.Log.Fatalf("表结构生成失败: %s", err)
 	}
