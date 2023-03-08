@@ -15,5 +15,5 @@ func init() {
 	// 初始化日志组件
 	InitLogger()
 	// 初始化数据访问组件
-	initMysqlConfigure()
+	initDataSourceConfigure()
 }

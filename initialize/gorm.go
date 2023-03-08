@@ -3,6 +3,7 @@ package initialize
 import (
 	"fmt"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -15,20 +16,26 @@ import (
 	"time"
 )
 
-// initMysqlConfigure 初始化Mysql
-func initMysqlConfigure() {
+// initDataSourceConfigure 初始化Mysql
+func initDataSourceConfigure() {
 	// 获取Mysql相关配置属性
 	dbConfig := &constant.Config.Mysql
 	if utils.StrIsBlank(dbConfig.Host) {
-		constant.Log.Panic("Mysql Host 未配置")
+		constant.Log.Panic("DataSource Host 未配置")
 	}
-
-	// Mysql配置
-	mysqlConfig := getMysqlConfig(dbConfig)
-	// gorm 配置
-	gormConfig := getGormConfig(dbConfig)
+	var dial gorm.Dialector
+	var gormConfig *gorm.Config
+	if constant.Config.Server.DbType == "pgsql" {
+		// 配置pgsql连接
+		dial = postgres.New(getPostgresSqlConfig(&constant.Config.Pgsql))
+		gormConfig = getGormConfig(&constant.Config.Pgsql)
+	} else {
+		// 配置mysql连接
+		dial = mysql.New(getMysqlConfig(&constant.Config.Mysql))
+		gormConfig = getGormConfig(&constant.Config.Mysql)
+	}
 	// 连接数据库
-	client, err := gorm.Open(mysql.New(mysqlConfig), gormConfig)
+	client, err := gorm.Open(dial, gormConfig)
 	if err != nil {
 		panic(fmt.Errorf("mysql open error: %s", err))
 	}
@@ -74,17 +81,25 @@ func tableMigrate(client *gorm.DB) {
 	constant.Log.Info("Table Create Success")
 }
 
-// 自定义Mysql配置
-func getMysqlConfig(conf *config.Mysql) mysql.Config {
+// 获取自定义Mysql配置
+func getMysqlConfig(conf *config.DataSource) mysql.Config {
 	return mysql.Config{
-		DSN:                      conf.Dns(), //数据库链接
-		DefaultStringSize:        256,        // string 类型字段的默认长度
-		DisableDatetimePrecision: true,       //string 类型字段的默认长度
+		DSN:                      conf.MysqlDns(), //数据库链接
+		DefaultStringSize:        256,             // string 类型字段的默认长度
+		DisableDatetimePrecision: true,            //string 类型字段的默认长度
+	}
+}
+
+// 获取自定义PgSql配置
+func getPostgresSqlConfig(conf *config.DataSource) postgres.Config {
+	return postgres.Config{
+		DSN:                  conf.PgSqlDns(),
+		PreferSimpleProtocol: false,
 	}
 }
 
 // getGormConfig 自定义Gorm配置
-func getGormConfig(conf *config.Mysql) *gorm.Config {
+func getGormConfig(conf *config.DataSource) *gorm.Config {
 	logLevel := logger.Info
 	if conf.LogLevel == "prod" {
 		logLevel = logger.Error

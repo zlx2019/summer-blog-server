@@ -3,6 +3,19 @@ server:
   host: 0.0.0.0
   port: 13001
   env: debug  #debug|release
+  db_type: mysql
+
+# postgresql配置
+pgsql:
+  host: 127.0.0.1
+  port: 5432
+  db_name: summer_blog
+  username: summer
+  password: summer
+  # dev环境输出sql日志
+  log_level: dev
+  # 是否自动生成表结构
+  create_table: true
 
 # mysql配置
 mysql:
@@ -14,7 +27,7 @@ mysql:
   # dev环境输出sql日志
   log_level: dev
   # 是否自动生成表结构
-  create_table: false
+  create_table: true
 
 # 日志配置
 logger:

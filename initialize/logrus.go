@@ -108,7 +108,7 @@ func (*LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 		// 文件名:代码行号。在编辑器上生成链接,一键跳转到日志位置.
 		fileLine := fmt.Sprintf("%s:%d", basePath, line)
 		// 格式:
-		// [2023-03-02 15:52:33] [info] [summer/initialize.initMysqlConfigure] gorm.go:43 Gorm Init Success.
+		// [2023-03-02 15:52:33] [info] [summer/initialize.initDataSourceConfigure] gorm.go:43 Gorm Init Success.
 		fmt.Fprintf(b, "%s [%s] [\x1b[%dm%s\x1b[0m] [\u001B[%dm%s\u001B[0m] %s %s\n", logPrefix, timestamp, logLevelColor, entry.Level, logLevelColor, funcVal, fileLine, entry.Message)
 	} else {
 		fmt.Fprintf(b, "%s [%s] \x1b[%dm[%s]\x1b[0m %s\n", logPrefix, timestamp, logLevelColor, entry.Level, entry.Message)
