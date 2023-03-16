@@ -8,5 +8,6 @@
 package api
 
 import (
+	_ "summer/api/settings"
 	_ "summer/api/user"
 )

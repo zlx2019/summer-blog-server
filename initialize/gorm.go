@@ -9,30 +9,29 @@ import (
 	"gorm.io/gorm/schema"
 	"log"
 	"os"
-	"summer/config"
 	"summer/constant"
 	. "summer/models"
-	"summer/utils"
+	"summer/properties"
 	"time"
 )
 
 // initDataSourceConfigure 初始化Mysql
 func initDataSourceConfigure() {
-	// 获取Mysql相关配置属性
-	dbConfig := &constant.Config.Mysql
-	if utils.StrIsBlank(dbConfig.Host) {
-		constant.Log.Panic("DataSource Host 未配置")
-	}
 	var dial gorm.Dialector
 	var gormConfig *gorm.Config
+	var isCreateTable bool
 	if constant.Config.Server.DbType == "pgsql" {
 		// 配置pgsql连接
-		dial = postgres.New(getPostgresSqlConfig(&constant.Config.Pgsql))
-		gormConfig = getGormConfig(&constant.Config.Pgsql)
+		pgConfig := &constant.Config.Pgsql
+		isCreateTable = pgConfig.CreateTable
+		dial = postgres.New(getPostgresSqlConfig(pgConfig))
+		gormConfig = getGormConfig(pgConfig)
 	} else {
 		// 配置mysql连接
-		dial = mysql.New(getMysqlConfig(&constant.Config.Mysql))
-		gormConfig = getGormConfig(&constant.Config.Mysql)
+		myConfig := &constant.Config.Mysql
+		isCreateTable = myConfig.CreateTable
+		dial = mysql.New(getMysqlConfig(myConfig))
+		gormConfig = getGormConfig(myConfig)
 	}
 	// 连接数据库
 	client, err := gorm.Open(dial, gormConfig)
@@ -47,7 +46,7 @@ func initDataSourceConfigure() {
 	constant.Db = client
 	constant.Log.Info("Gorm Init Success.")
 	// 表结构迁移生成
-	if dbConfig.CreateTable {
+	if isCreateTable {
 		tableMigrate(client)
 	}
 }
@@ -82,7 +81,7 @@ func tableMigrate(client *gorm.DB) {
 }
 
 // 获取自定义Mysql配置
-func getMysqlConfig(conf *config.DataSource) mysql.Config {
+func getMysqlConfig(conf *properties.DataSource) mysql.Config {
 	return mysql.Config{
 		DSN:                      conf.MysqlDns(), //数据库链接
 		DefaultStringSize:        256,             // string 类型字段的默认长度
@@ -91,7 +90,7 @@ func getMysqlConfig(conf *config.DataSource) mysql.Config {
 }
 
 // 获取自定义PgSql配置
-func getPostgresSqlConfig(conf *config.DataSource) postgres.Config {
+func getPostgresSqlConfig(conf *properties.DataSource) postgres.Config {
 	return postgres.Config{
 		DSN:                  conf.PgSqlDns(),
 		PreferSimpleProtocol: false,
@@ -99,7 +98,7 @@ func getPostgresSqlConfig(conf *config.DataSource) postgres.Config {
 }
 
 // getGormConfig 自定义Gorm配置
-func getGormConfig(conf *config.DataSource) *gorm.Config {
+func getGormConfig(conf *properties.DataSource) *gorm.Config {
 	logLevel := logger.Info
 	if conf.LogLevel == "prod" {
 		logLevel = logger.Error

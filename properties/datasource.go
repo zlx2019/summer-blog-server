@@ -1,11 +1,11 @@
 /**
   @author: Zero
   @date: 2023/3/8 13:09:46
-  @desc: Mysql配置属性实体
+  @desc: 数据访问层配置属性实体
 
 **/
 
-package config
+package properties
 
 import "fmt"
 

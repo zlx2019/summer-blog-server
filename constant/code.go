@@ -11,9 +11,12 @@ package constant
 // 20xx 为用户模块错误码
 const (
 	// SUCCESS 请求成功 ERROR 请求失败。
-	// 础响应码
 	SUCCESS int = iota
 	ERROR
+
+	// BAD_REQUEST 参数校验异常
+	//
+	BAD_REQUEST = 400
 
 	SettingsErr  = 1001
 	UserNotFound = 2001
@@ -25,6 +28,7 @@ var resultMap = map[int]string{
 	ERROR:        "请求失败",
 	SettingsErr:  "设置模块错误",
 	UserNotFound: "用户不存在",
+	BAD_REQUEST:  "参数解析错误",
 }
 
 // Message 根据响应码获取响应消息

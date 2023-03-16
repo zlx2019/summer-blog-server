@@ -7,12 +7,21 @@
 
 package settings
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"summer/router"
+)
 
 type RouterSettings struct {
 }
 
+func init() {
+	// 注册Settings的路由
+	router.RegisterRouter(&RouterSettings{})
+}
+
 func (*RouterSettings) Route(engine *gin.Engine) {
 	group := engine.Group("/settings")
-	group.GET("/hello", GetSettings)
+	group.GET("/", GetConfig)
+	group.PUT("/", UpdateConfig)
 }

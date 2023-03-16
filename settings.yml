@@ -1,38 +1,63 @@
-# 服务运行配置
 server:
   host: 0.0.0.0
   port: 13001
-  env: debug  #debug|release
-  db_type: mysql
-
-# postgresql配置
-pgsql:
-  host: 127.0.0.1
-  port: 5432
-  db_name: summer_blog
-  username: summer
-  password: summer
-  # dev环境输出sql日志
-  log_level: dev
-  # 是否自动生成表结构
-  create_table: true
-
-# mysql配置
+  env: debug
+  db_type: pgsql
 mysql:
   host: 127.0.0.1
   port: 3306
   db_name: summer_blog
   username: root
   password: rootROOT@1234
-  # dev环境输出sql日志
   log_level: dev
-  # 是否自动生成表结构
-  create_table: true
-
-# 日志配置
+  create_table: false
+pgsql:
+  host: 127.0.0.1
+  port: 5432
+  db_name: summer_blog
+  username: summer
+  password: summer
+  log_level: dev
+  create_table: false
 logger:
-  level: debug #日志等级 info warning debug
-  prefix: "[summer-blog]" #日志前缀
-  file_path: log #日志生成的目录名
-  show_line: true #是否显示行号
-  log_in_console: true #是否显示操作文件路径
+  level: debug
+  prefix: '[summer-blog]'
+  file_path: log
+  show_line: true
+  log_in_console: true
+site_info:
+  created: "2023-03-08"
+  bei_an: 备案号
+  title: Blogs
+  version: 1.0.0
+  email: 1143967454@qq.com
+  name: zero9501
+  work: 服务端开发
+  addr: 广州
+  slogan: Blogs
+  web: https://zlx2019.github.io
+  gitee: https://gitee.com
+  github: https://github.com/zlx2019
+qq:
+  app_id: xxx
+  key: xxx
+  redirect: xxxxd
+email:
+  host: xxx
+  port: xxx
+  user: xxx
+  password: xxx
+  sender: 发件人
+  use_ssl: false
+  user_tls: false
+jwt:
+  secret: xxx
+  expires: 48
+  issuer: zero
+qi_niu:
+  access_key: xxx
+  secret_key: xxx
+  bucket: xxx
+  domain: xxx
+  zone: xxx
+  size: 5

@@ -5,7 +5,7 @@
 
 **/
 
-package config
+package properties
 
 // Logger 		日志配置
 //
