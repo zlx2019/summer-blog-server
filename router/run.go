@@ -16,6 +16,7 @@ import (
 	"os/signal"
 	"strconv"
 	. "summer/constant"
+	"summer/middleware"
 	"syscall"
 	"time"
 )
@@ -33,6 +34,8 @@ func Run() {
 
 	// 创建服务实例
 	application := gin.Default()
+	// 使用自定义错误处理中间件
+	application.Use(middleware.Recover)
 	// 使用自定义日志中间件
 	//application.Use(middleware.Logger())
 	// 绑定路由

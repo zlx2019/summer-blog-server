@@ -1,7 +1,7 @@
 /**
   @author: Zero
   @date: 2023/3/18 16:28:40
-  @desc: gin整合logrus日志
+  @desc: gin整合logrus日志中间件
 
 **/
 

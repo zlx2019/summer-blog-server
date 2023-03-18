@@ -8,6 +8,7 @@
 package settings
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"gopkg.in/yaml.v2"
 	"io/fs"
@@ -37,6 +38,7 @@ const (
 // state = 2 获取jwt配置信息
 //...
 func GetConfig(ctx *gin.Context) {
+	panic(errors.New("这是个假的错误"))
 	stateQuery := ctx.Query("state")
 	if stateQuery == "" {
 		mono.FailWithMessage("state未填.", ctx)
