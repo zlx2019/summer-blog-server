@@ -25,6 +25,6 @@ type Config struct {
 type Server struct {
 	Host   string `yaml:"host"`    //服务运行的IP
 	Port   int    `yaml:"port"`    //服务运行的端口
-	Env    string `yaml:"env"`     // 运行环境
+	Env    string `yaml:"env"`     // 运行环境 debug|release|test
 	DbType string `yaml:"db_type"` //数据库类型
 }

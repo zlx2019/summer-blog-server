@@ -107,10 +107,10 @@ func newRotateLogs() (*rotatelogs.RotateLogs, error) {
 	// 获取日志文件最大保存的时间
 	maxAge := day * time.Duration(logConf.FileMaxAge)
 	write, err := rotatelogs.New(
-		filePath+"summer.%Y-%m-%d.log",
-		rotatelogs.WithLinkName(filePath+"summer.log"), //生成一个当天日志文件的软连接
-		rotatelogs.WithRotationTime(day),               //日志切割时间间隔
-		rotatelogs.WithMaxAge(maxAge),                  //日志最长保留时间
+		filePath+"business/business.%Y-%m-%d.log",
+		rotatelogs.WithLinkName(filePath+"business/business.log"), //生成一个当天日志文件的软连接
+		rotatelogs.WithRotationTime(day),                          //日志切割时间间隔
+		rotatelogs.WithMaxAge(maxAge),                             //日志最长保留时间
 	)
 	if err != nil {
 		return nil, err

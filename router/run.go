@@ -10,6 +10,7 @@ package router
 import (
 	"context"
 	"github.com/gin-gonic/gin"
+	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,9 +22,19 @@ import (
 
 // Run 启动项目
 func Run() {
-	// 创建服务
+	// 设置全局gin环境
 	gin.SetMode(Config.Server.Env)
+	//将本次运行后的gin日志同时写到控制台和文件
+	file, err := os.Create("logs/application.log")
+	if err != nil {
+		panic(err)
+	}
+	gin.DefaultWriter = io.MultiWriter(os.Stdout, file)
+
+	// 创建服务实例
 	application := gin.Default()
+	// 使用自定义日志中间件
+	//application.Use(middleware.Logger())
 	// 绑定路由
 	InitRouters(application)
 	server := Config.Server
