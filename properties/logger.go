@@ -15,9 +15,11 @@ package properties
 // ShowLine		是否显示行号
 // LogInConsole	是否显示操作文件路径
 type Logger struct {
-	Level        string `yaml:"level"`
-	Prefix       string `yaml:"prefix"`
-	FilePath     string `yaml:"file_path"`
-	ShowLine     bool   `yaml:"show_line"`
-	LogInConsole bool   `yaml:"log_in_console"`
+	Level        string `yaml:"level"`          //日志级别 [panic fatal error warn info debug trace]
+	Prefix       string `yaml:"prefix"`         // 日志格式前缀
+	ShowLine     bool   `yaml:"show_line"`      // 是否显示代码行号
+	LogInConsole bool   `yaml:"log_in_console"` //是否显示操作文件路径
+	FilePath     string `yaml:"file_path"`      //生成的日志文件目录
+	FileSplitDay int    `yaml:"file_split_day"` //每几天生成一个新的日志文件
+	FileMaxAge   int    `yaml:"file_max_age"`   //日志文件最多保留几天
 }

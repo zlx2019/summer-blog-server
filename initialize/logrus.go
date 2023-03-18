@@ -7,30 +7,13 @@
 package initialize
 
 import (
-	"bytes"
-	"fmt"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/sirupsen/logrus"
+	"io"
 	"os"
-	"path"
 	"summer/constant"
-)
-
-// 日志颜色
-// RED 红色
-// GREEN 绿色
-// YELLOW 黄色
-// BLUE 蓝色
-// PURPLE 紫红
-// CYAN 青蓝色
-// WHITE 白色
-const (
-	RED    = 31
-	GREEN  = 32
-	YELLOW = 33
-	BLUE   = 34
-	PURPLE = 35
-	CYAN   = 36
-	WHITE  = 37
+	"summer/handler/log"
+	"time"
 )
 
 // InitLogger 初始化Log组件
@@ -40,25 +23,40 @@ func InitLogger() {
 
 // InitLogrus 初始化Logrus实例
 func InitLogrus() *logrus.Logger {
-	logger := logrus.New()                                  //创建logrus一个实例
-	logger.SetOutput(os.Stdout)                             //输出类型
-	logger.SetReportCaller(constant.Config.Logger.ShowLine) //开启日志返回函数和行号
-	logger.SetFormatter(&LogFormatter{})                    // 日志格式使用自定义的
-	// 转换日志级别 string 转 int32
+	//创建logrus一个实例
+	logger := logrus.New()
+	// 创建日志切割配置
+	logFileWrite, err := newRotateLogs()
+	if err != nil {
+		panic(err)
+	}
+	//开启日志返回函数和行号
+	logger.SetReportCaller(constant.Config.Logger.ShowLine)
+	//TODO 因为终端日志部分内容 携带了color,所以要和日志文件采用不同的日志格式
+
+	// 设置自定义的终端日志格式
+	logger.SetOutput(os.Stdout)
+	logger.SetFormatter(&log.ConsoleLogFormatter{})
+	// 设置要输出的日志文件，和日志文件输出格式
+	logger.AddHook(NewWriterHook(logFileWrite, &log.FileLogFormatter{}))
+	// 根据配置的项目日志级别,开启logrus的日志级别
 	level, err := logrus.ParseLevel(constant.Config.Logger.Level)
 	if err != nil {
 		level = logrus.InfoLevel
 	}
 	logger.SetLevel(level) //日志级别
-	InitGlobalLogrus()
+	InitGlobalLogrus(logFileWrite)
 	return logger
 }
 
 // InitGlobalLogrus 初始化全局Logrus
-func InitGlobalLogrus() {
-	logrus.SetOutput(os.Stdout)
+func InitGlobalLogrus(logFileWrite *rotatelogs.RotateLogs) {
 	logrus.SetReportCaller(constant.Config.Logger.ShowLine)
-	logrus.SetFormatter(&LogFormatter{})
+	// 设置自定义的终端日志格式
+	logrus.SetOutput(os.Stdout)
+	logrus.SetFormatter(&log.ConsoleLogFormatter{})
+	// 设置日志文件输出格式
+	logrus.AddHook(NewWriterHook(logFileWrite, &log.FileLogFormatter{}))
 	// 转换日志级别
 	level, err := logrus.ParseLevel(constant.Config.Logger.Level)
 	if err != nil {
@@ -67,51 +65,55 @@ func InitGlobalLogrus() {
 	logrus.SetLevel(level)
 }
 
-// LogFormatter 重写logrus组件格式化
-type LogFormatter struct{}
+// WriterHook 自定义Hook
+// 用于将日志输入到不同Writer中时使用不同的日志格式
+type WriterHook struct {
+	Writer    io.Writer
+	Formatter logrus.Formatter
+}
 
-// Format 日志自定义格式化
-func (*LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	// 根据日志类型,展示选用不同的颜色
-	var logLevelColor int
-	switch entry.Level {
-	case logrus.DebugLevel, logrus.TraceLevel:
-		// 调试日志
-		logLevelColor = BLUE
-	case logrus.WarnLevel:
-		// 警告日志
-		logLevelColor = YELLOW
-	case logrus.ErrorLevel, logrus.FatalLevel, logrus.PanicLevel:
-		// 错误日志
-		logLevelColor = RED
-	default:
-		// 正常日志
-		logLevelColor = GREEN
+// NewWriterHook 构建WriterHook
+// writer: 要写入的日志文件
+// formatter 日志文件的格式
+func NewWriterHook(writer io.Writer, formatter logrus.Formatter) *WriterHook {
+	return &WriterHook{
+		Writer:    writer,
+		Formatter: formatter,
 	}
-	var b *bytes.Buffer
-	if entry.Buffer != nil {
-		b = entry.Buffer
-	} else {
-		b = &bytes.Buffer{}
+}
+
+// Levels 设置哪些级别的日志会触发此钩子函数
+func (hook *WriterHook) Levels() []logrus.Level {
+	return logrus.AllLevels
+}
+
+// Fire 日志数据写入到指定writer
+func (hook *WriterHook) Fire(entry *logrus.Entry) error {
+	line, err := hook.Formatter.Format(entry)
+	if err != nil {
+		return err
 	}
-	// 日志日期格式
-	timestamp := entry.Time.Format("2006-01-02 15:04:05")
-	logPrefix := constant.Config.Logger.Prefix
-	// 控制台日志输出
-	if entry.HasCaller() {
-		// 日志输出的所在方法路径
-		funcVal := entry.Caller.Function
-		// 日志输出的所在文件的相对路径
-		basePath := path.Base(entry.Caller.File)
-		// 日志输出的代码行号
-		line := entry.Caller.Line
-		// 文件名:代码行号。在编辑器上生成链接,一键跳转到日志位置.
-		fileLine := fmt.Sprintf("%s:%d", basePath, line)
-		// 格式:
-		// [2023-03-02 15:52:33] [info] [summer/initialize.initDataSourceConfigure] gorm.go:43 Gorm Init Success.
-		fmt.Fprintf(b, "%s [%s] [\x1b[%dm%s\x1b[0m] [\u001B[%dm%s\u001B[0m] %s %s\n", logPrefix, timestamp, logLevelColor, entry.Level, logLevelColor, funcVal, fileLine, entry.Message)
-	} else {
-		fmt.Fprintf(b, "%s [%s] \x1b[%dm[%s]\x1b[0m %s\n", logPrefix, timestamp, logLevelColor, entry.Level, entry.Message)
+	_, err = hook.Writer.Write(line)
+	return err
+}
+
+// 日志文件切割规则
+func newRotateLogs() (*rotatelogs.RotateLogs, error) {
+	logConf := constant.Config.Logger
+	// 日志文件存放目录
+	var filePath = logConf.FilePath
+	//获取时间为日的单位,按照每日进行分割。
+	day := time.Duration(logConf.FileSplitDay*24) * time.Hour
+	// 获取日志文件最大保存的时间
+	maxAge := day * time.Duration(logConf.FileMaxAge)
+	write, err := rotatelogs.New(
+		filePath+"summer.%Y-%m-%d.log",
+		rotatelogs.WithLinkName(filePath+"summer.log"), //生成一个当天日志文件的软连接
+		rotatelogs.WithRotationTime(day),               //日志切割时间间隔
+		rotatelogs.WithMaxAge(maxAge),                  //日志最长保留时间
+	)
+	if err != nil {
+		return nil, err
 	}
-	return b.Bytes(), nil
+	return write, nil
 }

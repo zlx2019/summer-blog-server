@@ -66,7 +66,7 @@ func RunHttpServer(engine *gin.Engine, host string, port int) {
 		//TODO 释放资源
 		Log.Error(err)
 	}
-	// 等待5秒时间过后,结束程序.
+	// 等待释放资源,结束程序.
 	select {
 	case <-closeCtx.Done():
 		Log.Info("Wait Close Resource Timeout...")

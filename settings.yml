@@ -22,7 +22,12 @@ pgsql:
 logger:
   level: debug
   prefix: '[summer-blog]'
-  file_path: log
+  # 日志文件存放目录
+  file_path: logs/
+  # 每天生成新的日志文件
+  file_split_day: 1
+  # 最多保留30天
+  file_max_age: 30
   show_line: true
   log_in_console: true
 site_info:
